@@ -34,6 +34,8 @@ const emptyFunnel: FunnelData = {
 const emptyCosts: CostData = {
   custoLeadMeta: 0,
   custoLeadGoogle: 0,
+  valorGastoMeta: 0,
+  valorGastoGoogle: 0,
 };
 
 const Index = () => {

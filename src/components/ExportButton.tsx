@@ -56,10 +56,14 @@ export function ExportButton({
     yPos += 12;
 
     pdf.setFontSize(14);
-    pdf.text('Custo por Lead', 20, yPos);
+    pdf.text('Dados de Marketing', 20, yPos);
     yPos += 8;
 
     pdf.setFontSize(10);
+    pdf.text(`Valor Gasto (Meta): R$ ${(costs.valorGastoMeta || 0).toFixed(2)}`, 25, yPos);
+    yPos += 6;
+    pdf.text(`Valor Gasto (Google): R$ ${(costs.valorGastoGoogle || 0).toFixed(2)}`, 25, yPos);
+    yPos += 6;
     pdf.text(`Custo por Lead (Meta): R$ ${costs.custoLeadMeta.toFixed(2)}`, 25, yPos);
     yPos += 6;
     pdf.text(`Custo por Lead (Google): R$ ${costs.custoLeadGoogle.toFixed(2)}`, 25, yPos);

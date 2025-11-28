@@ -14,6 +14,8 @@ export interface FunnelData {
 export interface CostData {
   custoLeadMeta: number;
   custoLeadGoogle: number;
+  valorGastoMeta: number;
+  valorGastoGoogle: number;
 }
 
 export interface AnalysisData {
