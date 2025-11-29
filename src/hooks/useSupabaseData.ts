@@ -1,0 +1,211 @@
+import { useState, useEffect, useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { Clinic, FunnelData, CostData, AnalysisData } from '@/types/clinic';
+import { toast } from 'sonner';
+
+export function useSupabaseData() {
+  const [clinics, setClinics] = useState<Clinic[]>([]);
+  const [analyses, setAnalyses] = useState<AnalysisData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  // Fetch clinics
+  const fetchClinics = useCallback(async () => {
+    const { data, error } = await supabase
+      .from('clinics')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching clinics:', error);
+      toast.error('Erro ao carregar clínicas');
+      return;
+    }
+
+    setClinics(data.map(c => ({ id: c.id, name: c.name })));
+  }, []);
+
+  // Fetch analyses
+  const fetchAnalyses = useCallback(async () => {
+    const { data, error } = await supabase
+      .from('analyses')
+      .select('*');
+
+    if (error) {
+      console.error('Error fetching analyses:', error);
+      toast.error('Erro ao carregar análises');
+      return;
+    }
+
+    setAnalyses(data.map(a => ({
+      clinicId: a.clinic_id,
+      startDate: a.start_date,
+      endDate: a.end_date,
+      funnel: {
+        leadsMarketing: a.leads_marketing,
+        leadsCRM: a.leads_crm,
+        agendamentos: a.agendamentos,
+        comparecimentos: a.comparecimentos,
+        vendas: a.vendas,
+      },
+      costs: {
+        custoLeadMeta: Number(a.custo_lead_meta),
+        custoLeadGoogle: Number(a.custo_lead_google),
+        valorGastoMeta: Number(a.valor_gasto_meta),
+        valorGastoGoogle: Number(a.valor_gasto_google),
+      },
+      images: a.images || [],
+      observations: a.observations || '',
+    })));
+  }, []);
+
+  // Load initial data
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      await Promise.all([fetchClinics(), fetchAnalyses()]);
+      setLoading(false);
+    };
+    loadData();
+  }, [fetchClinics, fetchAnalyses]);
+
+  // Add clinic
+  const addClinic = async (name: string) => {
+    const { data, error } = await supabase
+      .from('clinics')
+      .insert({ name })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error adding clinic:', error);
+      toast.error('Erro ao adicionar clínica');
+      return null;
+    }
+
+    const newClinic: Clinic = { id: data.id, name: data.name };
+    setClinics(prev => [newClinic, ...prev]);
+    toast.success('Clínica adicionada com sucesso');
+    return newClinic;
+  };
+
+  // Delete clinic
+  const deleteClinic = async (id: string) => {
+    // First delete related analyses
+    await supabase.from('analyses').delete().eq('clinic_id', id);
+    
+    const { error } = await supabase
+      .from('clinics')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting clinic:', error);
+      toast.error('Erro ao excluir clínica');
+      return false;
+    }
+
+    setClinics(prev => prev.filter(c => c.id !== id));
+    setAnalyses(prev => prev.filter(a => a.clinicId !== id));
+    toast.success('Clínica excluída com sucesso');
+    return true;
+  };
+
+  // Save analysis
+  const saveAnalysis = async (
+    clinicId: string,
+    startDate: string,
+    endDate: string,
+    funnel: FunnelData,
+    costs: CostData,
+    images: string[],
+    observations: string
+  ) => {
+    setSaving(true);
+    
+    const analysisData = {
+      clinic_id: clinicId,
+      start_date: startDate,
+      end_date: endDate,
+      leads_marketing: funnel.leadsMarketing,
+      leads_crm: funnel.leadsCRM,
+      agendamentos: funnel.agendamentos,
+      comparecimentos: funnel.comparecimentos,
+      vendas: funnel.vendas,
+      custo_lead_meta: costs.custoLeadMeta,
+      custo_lead_google: costs.custoLeadGoogle,
+      valor_gasto_meta: costs.valorGastoMeta,
+      valor_gasto_google: costs.valorGastoGoogle,
+      images,
+      observations,
+    };
+
+    // Check if analysis exists
+    const { data: existing } = await supabase
+      .from('analyses')
+      .select('id')
+      .eq('clinic_id', clinicId)
+      .eq('start_date', startDate)
+      .eq('end_date', endDate)
+      .maybeSingle();
+
+    let error;
+    if (existing) {
+      const result = await supabase
+        .from('analyses')
+        .update(analysisData)
+        .eq('id', existing.id);
+      error = result.error;
+    } else {
+      const result = await supabase
+        .from('analyses')
+        .insert(analysisData);
+      error = result.error;
+    }
+
+    setSaving(false);
+
+    if (error) {
+      console.error('Error saving analysis:', error);
+      toast.error('Erro ao salvar análise');
+      return false;
+    }
+
+    // Update local state
+    const newAnalysis: AnalysisData = {
+      clinicId,
+      startDate,
+      endDate,
+      funnel,
+      costs,
+      images,
+      observations,
+    };
+
+    setAnalyses(prev => {
+      const existingIndex = prev.findIndex(
+        a => a.clinicId === clinicId && a.startDate === startDate && a.endDate === endDate
+      );
+      if (existingIndex >= 0) {
+        const updated = [...prev];
+        updated[existingIndex] = newAnalysis;
+        return updated;
+      }
+      return [...prev, newAnalysis];
+    });
+
+    toast.success('Análise salva com sucesso');
+    return true;
+  };
+
+  return {
+    clinics,
+    analyses,
+    loading,
+    saving,
+    addClinic,
+    deleteClinic,
+    saveAnalysis,
+    refetch: () => Promise.all([fetchClinics(), fetchAnalyses()]),
+  };
+}

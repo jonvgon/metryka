@@ -1,6 +1,5 @@
-import { useMemo } from 'react';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { Clinic, FunnelData, CostData, AnalysisData, CalculatedRates } from '@/types/clinic';
+import { useMemo, useState, useEffect } from 'react';
+import { Clinic, FunnelData, CostData, CalculatedRates } from '@/types/clinic';
 import { ClinicSelector } from '@/components/ClinicSelector';
 import { DateRangeSelector } from '@/components/DateRangeSelector';
 import { FunnelDataInput } from '@/components/FunnelDataInput';
@@ -9,6 +8,9 @@ import { RatesComparison } from '@/components/RatesComparison';
 import { FunnelVisualization } from '@/components/FunnelVisualization';
 import { CommercialAnalysis } from '@/components/CommercialAnalysis';
 import { ExportButton } from '@/components/ExportButton';
+import { useSupabaseData } from '@/hooks/useSupabaseData';
+import { Button } from '@/components/ui/button';
+import { Save, Loader2 } from 'lucide-react';
 
 const getDefaultDates = () => {
   const today = new Date();
@@ -39,53 +41,38 @@ const emptyCosts: CostData = {
 };
 
 const Index = () => {
-  const [clinics, setClinics] = useLocalStorage<Clinic[]>('clinics', []);
-  const [selectedClinicId, setSelectedClinicId] = useLocalStorage<string | null>('selectedClinicId', null);
-  const [analyses, setAnalyses] = useLocalStorage<AnalysisData[]>('analyses', []);
+  const { clinics, analyses, loading, saving, addClinic, deleteClinic, saveAnalysis } = useSupabaseData();
   
-  const [startDate, setStartDate] = useLocalStorage<string>('startDate', defaultDates.start);
-  const [endDate, setEndDate] = useLocalStorage<string>('endDate', defaultDates.end);
+  const [selectedClinicId, setSelectedClinicId] = useState<string | null>(null);
+  const [startDate, setStartDate] = useState<string>(defaultDates.start);
+  const [endDate, setEndDate] = useState<string>(defaultDates.end);
+  
+  // Local state for form data
+  const [funnel, setFunnel] = useState<FunnelData>(emptyFunnel);
+  const [costs, setCosts] = useState<CostData>(emptyCosts);
+  const [images, setImages] = useState<string[]>([]);
+  const [observations, setObservations] = useState<string>('');
 
   const selectedClinic = clinics.find(c => c.id === selectedClinicId) || null;
 
-  const currentAnalysis = useMemo(() => {
-    return analyses.find(
+  // Load existing analysis when clinic/dates change
+  useEffect(() => {
+    const existingAnalysis = analyses.find(
       a => a.clinicId === selectedClinicId && a.startDate === startDate && a.endDate === endDate
     );
+    
+    if (existingAnalysis) {
+      setFunnel(existingAnalysis.funnel);
+      setCosts(existingAnalysis.costs);
+      setImages(existingAnalysis.images);
+      setObservations(existingAnalysis.observations);
+    } else {
+      setFunnel(emptyFunnel);
+      setCosts(emptyCosts);
+      setImages([]);
+      setObservations('');
+    }
   }, [analyses, selectedClinicId, startDate, endDate]);
-
-  const funnel = currentAnalysis?.funnel || emptyFunnel;
-  const costs = currentAnalysis?.costs || emptyCosts;
-  const images = currentAnalysis?.images || [];
-  const observations = currentAnalysis?.observations || '';
-
-  const updateAnalysis = (updates: Partial<AnalysisData>) => {
-    if (!selectedClinicId) return;
-
-    setAnalyses(prev => {
-      const existingIndex = prev.findIndex(
-        a => a.clinicId === selectedClinicId && a.startDate === startDate && a.endDate === endDate
-      );
-
-      const newAnalysis: AnalysisData = {
-        clinicId: selectedClinicId,
-        startDate,
-        endDate,
-        funnel: updates.funnel || funnel,
-        costs: updates.costs || costs,
-        images: updates.images || images,
-        observations: updates.observations ?? observations,
-      };
-
-      if (existingIndex >= 0) {
-        const updated = [...prev];
-        updated[existingIndex] = newAnalysis;
-        return updated;
-      } else {
-        return [...prev, newAnalysis];
-      }
-    });
-  };
 
   const rates: CalculatedRates = useMemo(() => {
     return {
@@ -95,17 +82,15 @@ const Index = () => {
     };
   }, [funnel]);
 
-  const handleAddClinic = (name: string) => {
-    const newClinic: Clinic = {
-      id: Date.now().toString(),
-      name,
-    };
-    setClinics(prev => [...prev, newClinic]);
+  const handleAddClinic = async (name: string) => {
+    const newClinic = await addClinic(name);
+    if (newClinic) {
+      setSelectedClinicId(newClinic.id);
+    }
   };
 
-  const handleDeleteClinic = (id: string) => {
-    setClinics(prev => prev.filter(c => c.id !== id));
-    setAnalyses(prev => prev.filter(a => a.clinicId !== id));
+  const handleDeleteClinic = async (id: string) => {
+    await deleteClinic(id);
     if (selectedClinicId === id) {
       setSelectedClinicId(null);
     }
@@ -114,6 +99,19 @@ const Index = () => {
   const handleSelectClinic = (clinic: Clinic | null) => {
     setSelectedClinicId(clinic?.id || null);
   };
+
+  const handleSave = async () => {
+    if (!selectedClinicId) return;
+    await saveAnalysis(selectedClinicId, startDate, endDate, funnel, costs, images, observations);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -148,12 +146,12 @@ const Index = () => {
             <>
               <FunnelDataInput
                 data={funnel}
-                onChange={(newFunnel) => updateAnalysis({ funnel: newFunnel })}
+                onChange={setFunnel}
               />
 
               <CostInput
                 data={costs}
-                onChange={(newCosts) => updateAnalysis({ costs: newCosts })}
+                onChange={setCosts}
               />
 
               <RatesComparison rates={rates} />
@@ -163,11 +161,19 @@ const Index = () => {
               <CommercialAnalysis
                 images={images}
                 observations={observations}
-                onImagesChange={(newImages) => updateAnalysis({ images: newImages })}
-                onObservationsChange={(newObs) => updateAnalysis({ observations: newObs })}
+                onImagesChange={setImages}
+                onObservationsChange={setObservations}
               />
 
-              <div className="flex justify-end">
+              <div className="flex justify-end gap-4">
+                <Button onClick={handleSave} disabled={saving}>
+                  {saving ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Save className="mr-2 h-4 w-4" />
+                  )}
+                  Salvar
+                </Button>
                 <ExportButton
                   clinic={selectedClinic}
                   startDate={startDate}
