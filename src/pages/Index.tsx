@@ -10,7 +10,8 @@ import { CommercialAnalysis } from '@/components/CommercialAnalysis';
 import { ExportButton } from '@/components/ExportButton';
 import { useSupabaseData } from '@/hooks/useSupabaseData';
 import { Button } from '@/components/ui/button';
-import { Save, Loader2 } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { Save, Loader2, Activity } from 'lucide-react';
 
 const getDefaultDates = () => {
   const today = new Date();
@@ -108,7 +109,7 @@ const Index = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -116,13 +117,21 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <header className="mb-8">
-          <h1 className="text-2xl font-bold text-foreground">
-            Sistema de Análise Comercial
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Análise semanal de clínicas odontológicas
-          </p>
+        <header className="mb-8 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Activity className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">
+                Sistema de Análise Comercial
+              </h1>
+              <p className="text-muted-foreground text-sm">
+                Análise semanal de clínicas odontológicas
+              </p>
+            </div>
+          </div>
+          <ThemeToggle />
         </header>
 
         <div className="space-y-6">
