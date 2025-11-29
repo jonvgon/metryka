@@ -14,7 +14,92 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      analyses: {
+        Row: {
+          agendamentos: number
+          clinic_id: string
+          comparecimentos: number
+          created_at: string
+          custo_lead_google: number
+          custo_lead_meta: number
+          end_date: string
+          id: string
+          images: string[] | null
+          leads_crm: number
+          leads_marketing: number
+          observations: string | null
+          start_date: string
+          updated_at: string
+          valor_gasto_google: number
+          valor_gasto_meta: number
+          vendas: number
+        }
+        Insert: {
+          agendamentos?: number
+          clinic_id: string
+          comparecimentos?: number
+          created_at?: string
+          custo_lead_google?: number
+          custo_lead_meta?: number
+          end_date: string
+          id?: string
+          images?: string[] | null
+          leads_crm?: number
+          leads_marketing?: number
+          observations?: string | null
+          start_date: string
+          updated_at?: string
+          valor_gasto_google?: number
+          valor_gasto_meta?: number
+          vendas?: number
+        }
+        Update: {
+          agendamentos?: number
+          clinic_id?: string
+          comparecimentos?: number
+          created_at?: string
+          custo_lead_google?: number
+          custo_lead_meta?: number
+          end_date?: string
+          id?: string
+          images?: string[] | null
+          leads_crm?: number
+          leads_marketing?: number
+          observations?: string | null
+          start_date?: string
+          updated_at?: string
+          valor_gasto_google?: number
+          valor_gasto_meta?: number
+          vendas?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analyses_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clinics: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
