@@ -18,6 +18,22 @@ export interface CostData {
   valorGastoGoogle: number;
 }
 
+export interface CommercialInputData {
+  cplBom: boolean | null;
+  leadsInteressados: boolean | null;
+  comercialBom: boolean | null;
+  comercialAplicouCpip: boolean | null;
+  linkAtendimentosRuins: string;
+  linkAtendimentosBons: string;
+  proximosPassos: string;
+}
+
+export interface AIAnalysisData {
+  diagnosticoComercial: string;
+  explicacaoTecnica: string;
+  recomendacoesIA: string;
+}
+
 export interface AnalysisData {
   clinicId: string;
   startDate: string;
@@ -26,6 +42,8 @@ export interface AnalysisData {
   costs: CostData;
   images: string[];
   observations: string;
+  commercialInput: CommercialInputData;
+  aiAnalysis: AIAnalysisData;
 }
 
 export interface CalculatedRates {

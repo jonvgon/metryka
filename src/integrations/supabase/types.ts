@@ -18,16 +18,26 @@ export type Database = {
         Row: {
           agendamentos: number
           clinic_id: string
+          comercial_aplicou_cpip: boolean | null
+          comercial_bom: boolean | null
           comparecimentos: number
+          cpl_bom: boolean | null
           created_at: string
           custo_lead_google: number
           custo_lead_meta: number
+          diagnostico_comercial: string | null
           end_date: string
+          explicacao_tecnica: string | null
           id: string
           images: string[] | null
           leads_crm: number
+          leads_interessados: boolean | null
           leads_marketing: number
+          link_atendimentos_bons: string | null
+          link_atendimentos_ruins: string | null
           observations: string | null
+          proximos_passos: string | null
+          recomendacoes_ia: string | null
           start_date: string
           updated_at: string
           valor_gasto_google: number
@@ -37,16 +47,26 @@ export type Database = {
         Insert: {
           agendamentos?: number
           clinic_id: string
+          comercial_aplicou_cpip?: boolean | null
+          comercial_bom?: boolean | null
           comparecimentos?: number
+          cpl_bom?: boolean | null
           created_at?: string
           custo_lead_google?: number
           custo_lead_meta?: number
+          diagnostico_comercial?: string | null
           end_date: string
+          explicacao_tecnica?: string | null
           id?: string
           images?: string[] | null
           leads_crm?: number
+          leads_interessados?: boolean | null
           leads_marketing?: number
+          link_atendimentos_bons?: string | null
+          link_atendimentos_ruins?: string | null
           observations?: string | null
+          proximos_passos?: string | null
+          recomendacoes_ia?: string | null
           start_date: string
           updated_at?: string
           valor_gasto_google?: number
@@ -56,16 +76,26 @@ export type Database = {
         Update: {
           agendamentos?: number
           clinic_id?: string
+          comercial_aplicou_cpip?: boolean | null
+          comercial_bom?: boolean | null
           comparecimentos?: number
+          cpl_bom?: boolean | null
           created_at?: string
           custo_lead_google?: number
           custo_lead_meta?: number
+          diagnostico_comercial?: string | null
           end_date?: string
+          explicacao_tecnica?: string | null
           id?: string
           images?: string[] | null
           leads_crm?: number
+          leads_interessados?: boolean | null
           leads_marketing?: number
+          link_atendimentos_bons?: string | null
+          link_atendimentos_ruins?: string | null
           observations?: string | null
+          proximos_passos?: string | null
+          recomendacoes_ia?: string | null
           start_date?: string
           updated_at?: string
           valor_gasto_google?: number

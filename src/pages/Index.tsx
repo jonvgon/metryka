@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
-import { Clinic, FunnelData, CostData, CalculatedRates } from '@/types/clinic';
+import { Clinic, FunnelData, CostData, CalculatedRates, CommercialInputData, AIAnalysisData } from '@/types/clinic';
 import { ClinicSelector } from '@/components/ClinicSelector';
 import { DateRangeSelector } from '@/components/DateRangeSelector';
 import { FunnelDataInput } from '@/components/FunnelDataInput';
@@ -7,6 +7,8 @@ import { CostInput } from '@/components/CostInput';
 import { RatesComparison } from '@/components/RatesComparison';
 import { FunnelVisualization } from '@/components/FunnelVisualization';
 import { CommercialAnalysis } from '@/components/CommercialAnalysis';
+import { CommercialInputSection } from '@/components/CommercialInputSection';
+import { AIAnalysisSection } from '@/components/AIAnalysisSection';
 import { ExportButton } from '@/components/ExportButton';
 import { useSupabaseData } from '@/hooks/useSupabaseData';
 import { Button } from '@/components/ui/button';
@@ -41,6 +43,22 @@ const emptyCosts: CostData = {
   valorGastoGoogle: 0,
 };
 
+const emptyCommercialInput: CommercialInputData = {
+  cplBom: null,
+  leadsInteressados: null,
+  comercialBom: null,
+  comercialAplicouCpip: null,
+  linkAtendimentosRuins: '',
+  linkAtendimentosBons: '',
+  proximosPassos: '',
+};
+
+const emptyAIAnalysis: AIAnalysisData = {
+  diagnosticoComercial: '',
+  explicacaoTecnica: '',
+  recomendacoesIA: '',
+};
+
 const Index = () => {
   const { clinics, analyses, loading, saving, addClinic, deleteClinic, saveAnalysis } = useSupabaseData();
   
@@ -53,6 +71,8 @@ const Index = () => {
   const [costs, setCosts] = useState<CostData>(emptyCosts);
   const [images, setImages] = useState<string[]>([]);
   const [observations, setObservations] = useState<string>('');
+  const [commercialInput, setCommercialInput] = useState<CommercialInputData>(emptyCommercialInput);
+  const [aiAnalysis, setAIAnalysis] = useState<AIAnalysisData>(emptyAIAnalysis);
 
   const selectedClinic = clinics.find(c => c.id === selectedClinicId) || null;
 
@@ -67,11 +87,15 @@ const Index = () => {
       setCosts(existingAnalysis.costs);
       setImages(existingAnalysis.images);
       setObservations(existingAnalysis.observations);
+      setCommercialInput(existingAnalysis.commercialInput || emptyCommercialInput);
+      setAIAnalysis(existingAnalysis.aiAnalysis || emptyAIAnalysis);
     } else {
       setFunnel(emptyFunnel);
       setCosts(emptyCosts);
       setImages([]);
       setObservations('');
+      setCommercialInput(emptyCommercialInput);
+      setAIAnalysis(emptyAIAnalysis);
     }
   }, [analyses, selectedClinicId, startDate, endDate]);
 
@@ -103,7 +127,17 @@ const Index = () => {
 
   const handleSave = async () => {
     if (!selectedClinicId) return;
-    await saveAnalysis(selectedClinicId, startDate, endDate, funnel, costs, images, observations);
+    await saveAnalysis(
+      selectedClinicId, 
+      startDate, 
+      endDate, 
+      funnel, 
+      costs, 
+      images, 
+      observations,
+      commercialInput,
+      aiAnalysis
+    );
   };
 
   if (loading) {
@@ -172,6 +206,20 @@ const Index = () => {
                 observations={observations}
                 onImagesChange={setImages}
                 onObservationsChange={setObservations}
+              />
+
+              <CommercialInputSection
+                data={commercialInput}
+                onChange={setCommercialInput}
+              />
+
+              <AIAnalysisSection
+                commercialInput={commercialInput}
+                funnel={funnel}
+                costs={costs}
+                rates={rates}
+                aiAnalysis={aiAnalysis}
+                onAIAnalysisChange={setAIAnalysis}
               />
 
               <div className="flex justify-end gap-4">
