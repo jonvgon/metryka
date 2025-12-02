@@ -1,7 +1,23 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Clinic, FunnelData, CostData, AnalysisData } from '@/types/clinic';
+import { Clinic, FunnelData, CostData, AnalysisData, CommercialInputData, AIAnalysisData } from '@/types/clinic';
 import { toast } from 'sonner';
+
+const emptyCommercialInput: CommercialInputData = {
+  cplBom: null,
+  leadsInteressados: null,
+  comercialBom: null,
+  comercialAplicouCpip: null,
+  linkAtendimentosRuins: '',
+  linkAtendimentosBons: '',
+  proximosPassos: '',
+};
+
+const emptyAIAnalysis: AIAnalysisData = {
+  diagnosticoComercial: '',
+  explicacaoTecnica: '',
+  recomendacoesIA: '',
+};
 
 export function useSupabaseData() {
   const [clinics, setClinics] = useState<Clinic[]>([]);
@@ -56,6 +72,20 @@ export function useSupabaseData() {
       },
       images: a.images || [],
       observations: a.observations || '',
+      commercialInput: {
+        cplBom: a.cpl_bom,
+        leadsInteressados: a.leads_interessados,
+        comercialBom: a.comercial_bom,
+        comercialAplicouCpip: a.comercial_aplicou_cpip,
+        linkAtendimentosRuins: a.link_atendimentos_ruins || '',
+        linkAtendimentosBons: a.link_atendimentos_bons || '',
+        proximosPassos: a.proximos_passos || '',
+      },
+      aiAnalysis: {
+        diagnosticoComercial: a.diagnostico_comercial || '',
+        explicacaoTecnica: a.explicacao_tecnica || '',
+        recomendacoesIA: a.recomendacoes_ia || '',
+      },
     })));
   }, []);
 
@@ -119,7 +149,9 @@ export function useSupabaseData() {
     funnel: FunnelData,
     costs: CostData,
     images: string[],
-    observations: string
+    observations: string,
+    commercialInput: CommercialInputData = emptyCommercialInput,
+    aiAnalysis: AIAnalysisData = emptyAIAnalysis
   ) => {
     setSaving(true);
     
@@ -138,6 +170,16 @@ export function useSupabaseData() {
       valor_gasto_google: costs.valorGastoGoogle,
       images,
       observations,
+      cpl_bom: commercialInput.cplBom,
+      leads_interessados: commercialInput.leadsInteressados,
+      comercial_bom: commercialInput.comercialBom,
+      comercial_aplicou_cpip: commercialInput.comercialAplicouCpip,
+      link_atendimentos_ruins: commercialInput.linkAtendimentosRuins,
+      link_atendimentos_bons: commercialInput.linkAtendimentosBons,
+      proximos_passos: commercialInput.proximosPassos,
+      diagnostico_comercial: aiAnalysis.diagnosticoComercial,
+      explicacao_tecnica: aiAnalysis.explicacaoTecnica,
+      recomendacoes_ia: aiAnalysis.recomendacoesIA,
     };
 
     // Check if analysis exists
@@ -180,6 +222,8 @@ export function useSupabaseData() {
       costs,
       images,
       observations,
+      commercialInput,
+      aiAnalysis,
     };
 
     setAnalyses(prev => {
