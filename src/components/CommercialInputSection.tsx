@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { CommercialInputData } from '@/types/clinic';
@@ -68,20 +67,24 @@ export function CommercialInputSection({ data, onChange }: CommercialInputSectio
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="linkAtendimentosRuins">Link Atendimentos Ruins</Label>
-            <Input
+            <Textarea
               id="linkAtendimentosRuins"
               placeholder="Cole o link aqui..."
               value={data.linkAtendimentosRuins}
               onChange={(e) => handleTextChange('linkAtendimentosRuins', e.target.value)}
+              rows={3}
+              className="resize-none"
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="linkAtendimentosBons">Link Atendimentos Bons</Label>
-            <Input
+            <Textarea
               id="linkAtendimentosBons"
               placeholder="Cole o link aqui..."
               value={data.linkAtendimentosBons}
               onChange={(e) => handleTextChange('linkAtendimentosBons', e.target.value)}
+              rows={3}
+              className="resize-none"
             />
           </div>
         </div>
@@ -93,7 +96,7 @@ export function CommercialInputSection({ data, onChange }: CommercialInputSectio
             placeholder="Descreva os próximos passos planejados..."
             value={data.proximosPassos}
             onChange={(e) => handleTextChange('proximosPassos', e.target.value)}
-            rows={4}
+            rows={6}
           />
         </div>
       </CardContent>
