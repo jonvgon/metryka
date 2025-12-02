@@ -8,7 +8,6 @@ import { RatesComparison } from '@/components/RatesComparison';
 import { FunnelVisualization } from '@/components/FunnelVisualization';
 import { CommercialAnalysis } from '@/components/CommercialAnalysis';
 import { CommercialInputSection } from '@/components/CommercialInputSection';
-import { AIAnalysisSection } from '@/components/AIAnalysisSection';
 import { ExportButton } from '@/components/ExportButton';
 import { useSupabaseData } from '@/hooks/useSupabaseData';
 import { Button } from '@/components/ui/button';
@@ -211,15 +210,6 @@ const Index = () => {
               <CommercialInputSection
                 data={commercialInput}
                 onChange={setCommercialInput}
-              />
-
-              <AIAnalysisSection
-                commercialInput={commercialInput}
-                funnel={funnel}
-                costs={costs}
-                rates={rates}
-                aiAnalysis={aiAnalysis}
-                onAIAnalysisChange={setAIAnalysis}
               />
 
               <div className="flex justify-end gap-4">

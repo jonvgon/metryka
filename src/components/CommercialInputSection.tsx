@@ -2,8 +2,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
+import { Button } from '@/components/ui/button';
 import { CommercialInputData } from '@/types/clinic';
+import { cn } from '@/lib/utils';
 
 interface CommercialInputSectionProps {
   data: CommercialInputData;
@@ -11,7 +12,7 @@ interface CommercialInputSectionProps {
 }
 
 export function CommercialInputSection({ data, onChange }: CommercialInputSectionProps) {
-  const handleBooleanChange = (field: keyof CommercialInputData, value: boolean) => {
+  const handleBooleanChange = (field: keyof CommercialInputData, value: boolean | null) => {
     onChange({ ...data, [field]: value });
   };
 
@@ -23,7 +24,7 @@ export function CommercialInputSection({ data, onChange }: CommercialInputSectio
     { key: 'cplBom', label: 'CPL bom?' },
     { key: 'leadsInteressados', label: 'Leads interessados?' },
     { key: 'comercialBom', label: 'Comercial bom?' },
-    { key: 'comercialAplicouCpip', label: 'Comercial aplicou CPIP?' },
+    { key: 'comercialAplicouCpip', label: 'Aplicou CPIP?' },
   ];
 
   return (
@@ -32,17 +33,40 @@ export function CommercialInputSection({ data, onChange }: CommercialInputSectio
         <CardTitle className="text-lg font-semibold">Análise Comercial - Inputs</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {booleanFields.map(({ key, label }) => (
-            <div key={key} className="flex items-center justify-between space-x-2 p-3 bg-muted/50 rounded-lg">
-              <Label htmlFor={key} className="text-sm font-medium cursor-pointer">
-                {label}
-              </Label>
-              <Switch
-                id={key}
-                checked={data[key] === true}
-                onCheckedChange={(checked) => handleBooleanChange(key, checked)}
-              />
+            <div key={key} className="space-y-2">
+              <Label className="text-sm font-medium">{label}</Label>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "flex-1 transition-colors",
+                    data[key] === true 
+                      ? "bg-green-600 text-white border-green-600 hover:bg-green-700 hover:text-white" 
+                      : "hover:bg-green-100 hover:text-green-700 hover:border-green-300"
+                  )}
+                  onClick={() => handleBooleanChange(key, true)}
+                >
+                  Sim
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "flex-1 transition-colors",
+                    data[key] === false 
+                      ? "bg-red-600 text-white border-red-600 hover:bg-red-700 hover:text-white" 
+                      : "hover:bg-red-100 hover:text-red-700 hover:border-red-300"
+                  )}
+                  onClick={() => handleBooleanChange(key, false)}
+                >
+                  Não
+                </Button>
+              </div>
             </div>
           ))}
         </div>
@@ -69,7 +93,7 @@ export function CommercialInputSection({ data, onChange }: CommercialInputSectio
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="proximosPassos">Próximos Passos (preenchido por você)</Label>
+          <Label htmlFor="proximosPassos">Próximos Passos</Label>
           <Textarea
             id="proximosPassos"
             placeholder="Descreva os próximos passos planejados..."
