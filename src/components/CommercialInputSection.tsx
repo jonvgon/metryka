@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { CommercialInputData } from '@/types/clinic';
 import { cn } from '@/lib/utils';
 
@@ -12,7 +12,7 @@ interface CommercialInputSectionProps {
 }
 
 export function CommercialInputSection({ data, onChange }: CommercialInputSectionProps) {
-  const handleBooleanChange = (field: keyof CommercialInputData, value: boolean | null) => {
+  const handleBooleanChange = (field: keyof CommercialInputData, value: boolean) => {
     onChange({ ...data, [field]: value });
   };
 
@@ -34,41 +34,35 @@ export function CommercialInputSection({ data, onChange }: CommercialInputSectio
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {booleanFields.map(({ key, label }) => (
-            <div key={key} className="space-y-2">
-              <Label className="text-sm font-medium">{label}</Label>
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className={cn(
-                    "flex-1 transition-colors",
-                    data[key] === true 
-                      ? "bg-green-600 text-white border-green-600 hover:bg-green-700 hover:text-white" 
-                      : "hover:bg-green-100 hover:text-green-700 hover:border-green-300"
-                  )}
-                  onClick={() => handleBooleanChange(key, true)}
-                >
-                  Sim
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className={cn(
-                    "flex-1 transition-colors",
-                    data[key] === false 
-                      ? "bg-red-600 text-white border-red-600 hover:bg-red-700 hover:text-white" 
-                      : "hover:bg-red-100 hover:text-red-700 hover:border-red-300"
-                  )}
-                  onClick={() => handleBooleanChange(key, false)}
-                >
-                  Não
-                </Button>
+          {booleanFields.map(({ key, label }) => {
+            const isChecked = data[key] === true;
+            return (
+              <div key={key} className="space-y-2">
+                <Label className="text-sm font-medium">{label}</Label>
+                <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                  <span className={cn(
+                    "text-sm font-medium transition-colors",
+                    !isChecked ? "text-red-500" : "text-muted-foreground"
+                  )}>
+                    Não
+                  </span>
+                  <Switch
+                    checked={isChecked}
+                    onCheckedChange={(checked) => handleBooleanChange(key, checked)}
+                    className={cn(
+                      "data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-red-500"
+                    )}
+                  />
+                  <span className={cn(
+                    "text-sm font-medium transition-colors",
+                    isChecked ? "text-green-500" : "text-muted-foreground"
+                  )}>
+                    Sim
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
