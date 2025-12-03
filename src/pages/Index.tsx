@@ -221,6 +221,7 @@ const Index = () => {
               <CostInput
                 data={costs}
                 onChange={setCosts}
+                leadsMarketing={funnel.leadsMarketing}
               />
 
               <RatesComparison rates={rates} />
