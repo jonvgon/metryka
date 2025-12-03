@@ -75,19 +75,46 @@ const Index = () => {
 
   const selectedClinic = clinics.find(c => c.id === selectedClinicId) || null;
 
-  // Load existing analysis when clinic/dates change
+  // Load and aggregate analyses when clinic/dates change
   useEffect(() => {
-    const existingAnalysis = analyses.find(
-      a => a.clinicId === selectedClinicId && a.startDate === startDate && a.endDate === endDate
-    );
-    
-    if (existingAnalysis) {
-      setFunnel(existingAnalysis.funnel);
-      setCosts(existingAnalysis.costs);
-      setImages(existingAnalysis.images);
-      setObservations(existingAnalysis.observations);
-      setCommercialInput(existingAnalysis.commercialInput || emptyCommercialInput);
-      setAIAnalysis(existingAnalysis.aiAnalysis || emptyAIAnalysis);
+    // Find all analyses for the clinic that overlap with the selected date range
+    const clinicAnalyses = analyses.filter(a => {
+      if (a.clinicId !== selectedClinicId) return false;
+      // Check if the analysis date range overlaps with the selected range
+      return a.startDate >= startDate && a.endDate <= endDate;
+    });
+
+    if (clinicAnalyses.length > 0) {
+      // Sum the fields that should be aggregated
+      const aggregatedFunnel: FunnelData = {
+        leadsMarketing: clinicAnalyses.reduce((sum, a) => sum + a.funnel.leadsMarketing, 0),
+        leadsCRM: clinicAnalyses.reduce((sum, a) => sum + a.funnel.leadsCRM, 0),
+        agendamentos: clinicAnalyses.reduce((sum, a) => sum + a.funnel.agendamentos, 0),
+        comparecimentos: clinicAnalyses.reduce((sum, a) => sum + a.funnel.comparecimentos, 0),
+        vendas: clinicAnalyses.reduce((sum, a) => sum + a.funnel.vendas, 0),
+      };
+
+      // Sum valorGasto fields, but NOT custoLead fields (use the latest/last value)
+      const aggregatedCosts: CostData = {
+        valorGastoMeta: clinicAnalyses.reduce((sum, a) => sum + a.costs.valorGastoMeta, 0),
+        valorGastoGoogle: clinicAnalyses.reduce((sum, a) => sum + a.costs.valorGastoGoogle, 0),
+        // CPL não deve ser somado - usar o último valor ou o mais recente
+        custoLeadMeta: clinicAnalyses[clinicAnalyses.length - 1].costs.custoLeadMeta,
+        custoLeadGoogle: clinicAnalyses[clinicAnalyses.length - 1].costs.custoLeadGoogle,
+      };
+
+      // Aggregate images from all analyses
+      const allImages = clinicAnalyses.flatMap(a => a.images);
+      
+      // Use the latest observation and commercial input
+      const latestAnalysis = clinicAnalyses[clinicAnalyses.length - 1];
+
+      setFunnel(aggregatedFunnel);
+      setCosts(aggregatedCosts);
+      setImages(allImages);
+      setObservations(latestAnalysis.observations);
+      setCommercialInput(latestAnalysis.commercialInput || emptyCommercialInput);
+      setAIAnalysis(latestAnalysis.aiAnalysis || emptyAIAnalysis);
     } else {
       setFunnel(emptyFunnel);
       setCosts(emptyCosts);
