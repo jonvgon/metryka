@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import GoogleAuth from "./pages/GoogleAuth";
 
 const queryClient = new QueryClient();
 
@@ -19,6 +20,7 @@ function App() {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<GoogleAuth />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

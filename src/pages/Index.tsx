@@ -2,7 +2,6 @@ import { useMemo, useState, useEffect } from 'react';
 import { Clinic, FunnelData, CostData, CalculatedRates, CommercialInputData, AIAnalysisData } from '@/types/clinic';
 import { ClinicSelector } from '@/components/ClinicSelector';
 import { DateRangeSelector } from '@/components/DateRangeSelector';
-import { FunnelDataInput } from '@/components/FunnelDataInput';
 import { CostInput } from '@/components/CostInput';
 import { RatesComparison } from '@/components/RatesComparison';
 import { FunnelVisualization } from '@/components/FunnelVisualization';
@@ -213,11 +212,6 @@ const Index = () => {
 
           {selectedClinic && (
             <>
-              <FunnelDataInput
-                data={funnel}
-                onChange={setFunnel}
-              />
-
               <CostInput
                 data={costs}
                 onChange={setCosts}
@@ -227,18 +221,6 @@ const Index = () => {
               <RatesComparison rates={rates} />
 
               <FunnelVisualization data={funnel} />
-
-              <CommercialAnalysis
-                images={images}
-                observations={observations}
-                onImagesChange={setImages}
-                onObservationsChange={setObservations}
-              />
-
-              <CommercialInputSection
-                data={commercialInput}
-                onChange={setCommercialInput}
-              />
 
               <div className="flex justify-end gap-4">
                 <Button onClick={handleSave} disabled={saving}>

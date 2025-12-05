@@ -27,90 +27,11 @@ export function CostInput({ data, onChange, leadsMarketing }: CostInputProps) {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="entrada" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-4">
-            <TabsTrigger value="entrada">Entrada de Dados</TabsTrigger>
-            <TabsTrigger value="cpl-geral">CPL Geral</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="entrada" className="space-y-6">
-            <div>
-              <h4 className="text-sm font-medium text-muted-foreground mb-3">Valor Gasto</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="valorGastoMeta">Valor Gasto (Meta)</Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">R$</span>
-                    <Input
-                      id="valorGastoMeta"
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={data.valorGastoMeta || ''}
-                      onChange={(e) => handleChange('valorGastoMeta', e.target.value)}
-                      placeholder="0,00"
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="valorGastoGoogle">Valor Gasto (Google)</Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">R$</span>
-                    <Input
-                      id="valorGastoGoogle"
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={data.valorGastoGoogle || ''}
-                      onChange={(e) => handleChange('valorGastoGoogle', e.target.value)}
-                      placeholder="0,00"
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="flex w-full justify-center mb-4">
+            <div>CPL Geral</div>
+          </div>
 
-            <div>
-              <h4 className="text-sm font-medium text-muted-foreground mb-3">Custo por Lead</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="custoLeadMeta">Custo por Lead (Meta)</Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">R$</span>
-                    <Input
-                      id="custoLeadMeta"
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={data.custoLeadMeta || ''}
-                      onChange={(e) => handleChange('custoLeadMeta', e.target.value)}
-                      placeholder="0,00"
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="custoLeadGoogle">Custo por Lead (Google)</Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">R$</span>
-                    <Input
-                      id="custoLeadGoogle"
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={data.custoLeadGoogle || ''}
-                      onChange={(e) => handleChange('custoLeadGoogle', e.target.value)}
-                      placeholder="0,00"
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="cpl-geral">
+          <div>
             <div className="space-y-4">
               <div className="text-center p-6 bg-primary/10 rounded-lg">
                 <p className="text-sm text-muted-foreground mb-2">Custo por Lead Geral do Período</p>
@@ -138,7 +59,7 @@ export function CostInput({ data, onChange, leadsMarketing }: CostInputProps) {
                 Cálculo: (R$ {data.valorGastoMeta.toFixed(2)} + R$ {data.valorGastoGoogle.toFixed(2)}) ÷ {leadsMarketing} = R$ {cplGeral.toFixed(2)}
               </p>
             </div>
-          </TabsContent>
+          </div>
         </Tabs>
       </CardContent>
     </Card>
