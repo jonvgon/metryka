@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Clinic, FunnelData, CostData, AnalysisData, CommercialInputData, AIAnalysisData } from '@/types/clinic';
+import { Gestor } from '@/types/gestor';
 import { toast } from 'sonner';
 
 const emptyCommercialInput: CommercialInputData = {
@@ -20,10 +21,27 @@ const emptyAIAnalysis: AIAnalysisData = {
 };
 
 export function useSupabaseData() {
-  const [clinics, setClinics] = useState<Clinic[]>([]);
+  const [gestores, setGestores] = useState<Gestor[]>([]);
+  const [clinics, setClinics] = useState<(Clinic & { gestorId?: string })[]>([]);
   const [analyses, setAnalyses] = useState<AnalysisData[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
+  // Fetch gestores
+  const fetchGestores = useCallback(async () => {
+    const { data, error } = await supabase
+      .from('gestores')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching gestores:', error);
+      toast.error('Erro ao carregar gestores');
+      return;
+    }
+
+    setGestores(data.map(g => ({ id: g.id, name: g.name })));
+  }, []);
 
   // Fetch clinics
   const fetchClinics = useCallback(async () => {
@@ -38,7 +56,7 @@ export function useSupabaseData() {
       return;
     }
 
-    setClinics(data.map(c => ({ id: c.id, name: c.name })));
+    setClinics(data.map(c => ({ id: c.id, name: c.name, gestorId: c.gestor_id || undefined })));
   }, []);
 
   // Fetch analyses
@@ -93,17 +111,56 @@ export function useSupabaseData() {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await Promise.all([fetchClinics(), fetchAnalyses()]);
+      await Promise.all([fetchGestores(), fetchClinics(), fetchAnalyses()]);
       setLoading(false);
     };
     loadData();
-  }, [fetchClinics, fetchAnalyses]);
+  }, [fetchGestores, fetchClinics, fetchAnalyses]);
+
+  // Add gestor
+  const addGestor = async (name: string) => {
+    const { data, error } = await supabase
+      .from('gestores')
+      .insert({ name })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error adding gestor:', error);
+      toast.error('Erro ao adicionar gestor');
+      return null;
+    }
+
+    const newGestor: Gestor = { id: data.id, name: data.name };
+    setGestores(prev => [newGestor, ...prev]);
+    toast.success('Gestor adicionado com sucesso');
+    return newGestor;
+  };
+
+  // Delete gestor
+  const deleteGestor = async (id: string) => {
+    const { error } = await supabase
+      .from('gestores')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting gestor:', error);
+      toast.error('Erro ao excluir gestor');
+      return false;
+    }
+
+    setGestores(prev => prev.filter(g => g.id !== id));
+    setClinics(prev => prev.filter(c => c.gestorId !== id));
+    toast.success('Gestor excluído com sucesso');
+    return true;
+  };
 
   // Add clinic
-  const addClinic = async (name: string) => {
+  const addClinic = async (name: string, gestorId?: string) => {
     const { data, error } = await supabase
       .from('clinics')
-      .insert({ name })
+      .insert({ name, gestor_id: gestorId })
       .select()
       .single();
 
@@ -113,7 +170,7 @@ export function useSupabaseData() {
       return null;
     }
 
-    const newClinic: Clinic = { id: data.id, name: data.name };
+    const newClinic = { id: data.id, name: data.name, gestorId: data.gestor_id || undefined };
     setClinics(prev => [newClinic, ...prev]);
     toast.success('Clínica adicionada com sucesso');
     return newClinic;
@@ -243,13 +300,16 @@ export function useSupabaseData() {
   };
 
   return {
+    gestores,
     clinics,
     analyses,
     loading,
     saving,
+    addGestor,
+    deleteGestor,
     addClinic,
     deleteClinic,
     saveAnalysis,
-    refetch: () => Promise.all([fetchClinics(), fetchAnalyses()]),
+    refetch: () => Promise.all([fetchGestores(), fetchClinics(), fetchAnalyses()]),
   };
 }

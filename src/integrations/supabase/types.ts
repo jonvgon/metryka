@@ -115,6 +115,35 @@ export type Database = {
       clinics: {
         Row: {
           created_at: string
+          gestor_id: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          gestor_id?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          gestor_id?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clinics_gestor_id_fkey"
+            columns: ["gestor_id"]
+            isOneToOne: false
+            referencedRelation: "gestores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gestores: {
+        Row: {
+          created_at: string
           id: string
           name: string
         }
