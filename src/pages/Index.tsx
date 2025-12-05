@@ -1,5 +1,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import { Clinic, FunnelData, CostData, CalculatedRates, CommercialInputData, AIAnalysisData } from '@/types/clinic';
+import { Gestor } from '@/types/gestor';
+import { GestorSelector } from '@/components/GestorSelector';
 import { ClinicSelector } from '@/components/ClinicSelector';
 import { DateRangeSelector } from '@/components/DateRangeSelector';
 import { FunnelDataInput } from '@/components/FunnelDataInput';
@@ -59,8 +61,9 @@ const emptyAIAnalysis: AIAnalysisData = {
 };
 
 const Index = () => {
-  const { clinics, analyses, loading, saving, addClinic, deleteClinic, saveAnalysis } = useSupabaseData();
+  const { gestores, clinics, analyses, loading, saving, addGestor, deleteGestor, addClinic, deleteClinic, saveAnalysis } = useSupabaseData();
   
+  const [selectedGestorId, setSelectedGestorId] = useState<string | null>(null);
   const [selectedClinicId, setSelectedClinicId] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<string>(defaultDates.start);
   const [endDate, setEndDate] = useState<string>(defaultDates.end);
@@ -73,7 +76,13 @@ const Index = () => {
   const [commercialInput, setCommercialInput] = useState<CommercialInputData>(emptyCommercialInput);
   const [aiAnalysis, setAIAnalysis] = useState<AIAnalysisData>(emptyAIAnalysis);
 
+  const selectedGestor = gestores.find(g => g.id === selectedGestorId) || null;
   const selectedClinic = clinics.find(c => c.id === selectedClinicId) || null;
+  
+  // Filter clinics by selected gestor
+  const filteredClinics = selectedGestorId 
+    ? clinics.filter(c => c.gestorId === selectedGestorId)
+    : clinics;
 
   // Load and aggregate analyses when clinic/dates change
   useEffect(() => {
@@ -133,8 +142,29 @@ const Index = () => {
     };
   }, [funnel]);
 
+  const handleAddGestor = async (name: string) => {
+    const newGestor = await addGestor(name);
+    if (newGestor) {
+      setSelectedGestorId(newGestor.id);
+    }
+  };
+
+  const handleDeleteGestor = async (id: string) => {
+    await deleteGestor(id);
+    if (selectedGestorId === id) {
+      setSelectedGestorId(null);
+      setSelectedClinicId(null);
+    }
+  };
+
+  const handleSelectGestor = (gestor: Gestor | null) => {
+    setSelectedGestorId(gestor?.id || null);
+    setSelectedClinicId(null); // Reset clinic when gestor changes
+  };
+
   const handleAddClinic = async (name: string) => {
-    const newClinic = await addClinic(name);
+    if (!selectedGestorId) return;
+    const newClinic = await addClinic(name, selectedGestorId);
     if (newClinic) {
       setSelectedClinicId(newClinic.id);
     }
@@ -196,12 +226,12 @@ const Index = () => {
 
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <ClinicSelector
-              clinics={clinics}
-              selectedClinic={selectedClinic}
-              onAddClinic={handleAddClinic}
-              onSelectClinic={handleSelectClinic}
-              onDeleteClinic={handleDeleteClinic}
+            <GestorSelector
+              gestores={gestores}
+              selectedGestor={selectedGestor}
+              onAddGestor={handleAddGestor}
+              onSelectGestor={handleSelectGestor}
+              onDeleteGestor={handleDeleteGestor}
             />
             <DateRangeSelector
               startDate={startDate}
@@ -210,6 +240,16 @@ const Index = () => {
               onEndDateChange={setEndDate}
             />
           </div>
+
+          {selectedGestor && (
+            <ClinicSelector
+              clinics={filteredClinics}
+              selectedClinic={selectedClinic}
+              onAddClinic={handleAddClinic}
+              onSelectClinic={handleSelectClinic}
+              onDeleteClinic={handleDeleteClinic}
+            />
+          )}
 
           {selectedClinic && (
             <>
@@ -263,7 +303,13 @@ const Index = () => {
             </>
           )}
 
-          {!selectedClinic && (
+          {!selectedGestor && (
+            <div className="text-center py-16 text-muted-foreground">
+              <p>Selecione ou cadastre um gestor para começar.</p>
+            </div>
+          )}
+
+          {selectedGestor && !selectedClinic && (
             <div className="text-center py-16 text-muted-foreground">
               <p>Selecione ou cadastre uma clínica para começar a análise.</p>
             </div>
