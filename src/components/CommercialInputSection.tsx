@@ -75,6 +75,16 @@ export function CommercialInputSection({ data, onChange }: CommercialInputSectio
               rows={3}
               className="resize-none"
             />
+            {data.linkAtendimentosRuins && data.linkAtendimentosRuins.trim() && (
+              <a
+                href={data.linkAtendimentosRuins.trim().startsWith('http') ? data.linkAtendimentosRuins.trim() : `https://${data.linkAtendimentosRuins.trim()}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+              >
+                Abrir link ↗
+              </a>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="linkAtendimentosBons">Link Atendimentos Bons</Label>
@@ -86,6 +96,16 @@ export function CommercialInputSection({ data, onChange }: CommercialInputSectio
               rows={3}
               className="resize-none"
             />
+            {data.linkAtendimentosBons && data.linkAtendimentosBons.trim() && (
+              <a
+                href={data.linkAtendimentosBons.trim().startsWith('http') ? data.linkAtendimentosBons.trim() : `https://${data.linkAtendimentosBons.trim()}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+              >
+                Abrir link ↗
+              </a>
+            )}
           </div>
         </div>
 
