@@ -80,9 +80,9 @@ export function CommercialInputSection({ data, onChange }: CommercialInputSectio
                 href={data.linkAtendimentosRuins.trim().startsWith('http') ? data.linkAtendimentosRuins.trim() : `https://${data.linkAtendimentosRuins.trim()}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+                className="text-sm text-primary hover:underline break-all"
               >
-                Abrir link ↗
+                {data.linkAtendimentosRuins.trim()}
               </a>
             )}
           </div>
@@ -101,9 +101,9 @@ export function CommercialInputSection({ data, onChange }: CommercialInputSectio
                 href={data.linkAtendimentosBons.trim().startsWith('http') ? data.linkAtendimentosBons.trim() : `https://${data.linkAtendimentosBons.trim()}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+                className="text-sm text-primary hover:underline break-all"
               >
-                Abrir link ↗
+                {data.linkAtendimentosBons.trim()}
               </a>
             )}
           </div>
