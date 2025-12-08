@@ -76,14 +76,23 @@ export function CommercialInputSection({ data, onChange }: CommercialInputSectio
               className="resize-none"
             />
             {data.linkAtendimentosRuins && data.linkAtendimentosRuins.trim() && (
-              <a
-                href={data.linkAtendimentosRuins.trim().startsWith('http') ? data.linkAtendimentosRuins.trim() : `https://${data.linkAtendimentosRuins.trim()}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-primary hover:underline break-all"
-              >
-                {data.linkAtendimentosRuins.trim()}
-              </a>
+              <div className="flex flex-col gap-1">
+                {data.linkAtendimentosRuins
+                  .split('\n')
+                  .map(link => link.trim())
+                  .filter(link => link.length > 0)
+                  .map((link, index) => (
+                    <a
+                      key={index}
+                      href={link.startsWith('http') ? link : `https://${link}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-primary hover:underline break-all"
+                    >
+                      {link}
+                    </a>
+                  ))}
+              </div>
             )}
           </div>
           <div className="space-y-2">
@@ -97,14 +106,23 @@ export function CommercialInputSection({ data, onChange }: CommercialInputSectio
               className="resize-none"
             />
             {data.linkAtendimentosBons && data.linkAtendimentosBons.trim() && (
-              <a
-                href={data.linkAtendimentosBons.trim().startsWith('http') ? data.linkAtendimentosBons.trim() : `https://${data.linkAtendimentosBons.trim()}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-primary hover:underline break-all"
-              >
-                {data.linkAtendimentosBons.trim()}
-              </a>
+              <div className="flex flex-col gap-1">
+                {data.linkAtendimentosBons
+                  .split('\n')
+                  .map(link => link.trim())
+                  .filter(link => link.length > 0)
+                  .map((link, index) => (
+                    <a
+                      key={index}
+                      href={link.startsWith('http') ? link : `https://${link}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-primary hover:underline break-all"
+                    >
+                      {link}
+                    </a>
+                  ))}
+              </div>
             )}
           </div>
         </div>
