@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
-import { Clinic, FunnelData, CostData, CalculatedRates, CommercialInputData, AIAnalysisData } from '@/types/clinic';
+import { Clinic, FunnelData, CostData, CalculatedRates, CommercialInputData, AIAnalysisData, SalesResultsData } from '@/types/clinic';
 import { Gestor } from '@/types/gestor';
 import { GestorSelector } from '@/components/GestorSelector';
 import { ClinicSelector } from '@/components/ClinicSelector';
@@ -8,6 +8,7 @@ import { FunnelDataInput } from '@/components/FunnelDataInput';
 import { CostInput } from '@/components/CostInput';
 import { RatesComparison } from '@/components/RatesComparison';
 import { FunnelVisualization } from '@/components/FunnelVisualization';
+import { SalesResultsInput } from '@/components/SalesResultsInput';
 import { CommercialAnalysis } from '@/components/CommercialAnalysis';
 import { CommercialInputSection } from '@/components/CommercialInputSection';
 import { ExportButton } from '@/components/ExportButton';
@@ -54,6 +55,13 @@ const emptyCommercialInput: CommercialInputData = {
   proximosPassos: '',
 };
 
+const emptySalesResults: SalesResultsData = {
+  valorFechamento: 0,
+  orcamentoAberto: 0,
+  leadsPerdidos: 0,
+  motivoPerdido: '',
+};
+
 const emptyAIAnalysis: AIAnalysisData = {
   diagnosticoComercial: '',
   explicacaoTecnica: '',
@@ -74,6 +82,7 @@ const Index = () => {
   const [images, setImages] = useState<string[]>([]);
   const [observations, setObservations] = useState<string>('');
   const [commercialInput, setCommercialInput] = useState<CommercialInputData>(emptyCommercialInput);
+  const [salesResults, setSalesResults] = useState<SalesResultsData>(emptySalesResults);
   const [aiAnalysis, setAIAnalysis] = useState<AIAnalysisData>(emptyAIAnalysis);
 
   const selectedGestor = gestores.find(g => g.id === selectedGestorId) || null;
@@ -123,6 +132,7 @@ const Index = () => {
       setImages(allImages);
       setObservations(latestAnalysis.observations);
       setCommercialInput(latestAnalysis.commercialInput || emptyCommercialInput);
+      setSalesResults(latestAnalysis.salesResults || emptySalesResults);
       setAIAnalysis(latestAnalysis.aiAnalysis || emptyAIAnalysis);
     } else {
       setFunnel(emptyFunnel);
@@ -130,6 +140,7 @@ const Index = () => {
       setImages([]);
       setObservations('');
       setCommercialInput(emptyCommercialInput);
+      setSalesResults(emptySalesResults);
       setAIAnalysis(emptyAIAnalysis);
     }
   }, [analyses, selectedClinicId, startDate, endDate]);
@@ -192,6 +203,7 @@ const Index = () => {
       images, 
       observations,
       commercialInput,
+      salesResults,
       aiAnalysis
     );
   };
@@ -267,6 +279,11 @@ const Index = () => {
               <RatesComparison rates={rates} />
 
               <FunnelVisualization data={funnel} />
+
+              <SalesResultsInput
+                data={salesResults}
+                onChange={setSalesResults}
+              />
 
               <CommercialAnalysis
                 images={images}

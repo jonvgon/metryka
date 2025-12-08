@@ -28,6 +28,13 @@ export interface CommercialInputData {
   proximosPassos: string;
 }
 
+export interface SalesResultsData {
+  valorFechamento: number;
+  orcamentoAberto: number;
+  leadsPerdidos: number;
+  motivoPerdido: string;
+}
+
 export interface AIAnalysisData {
   diagnosticoComercial: string;
   explicacaoTecnica: string;
@@ -43,6 +50,7 @@ export interface AnalysisData {
   images: string[];
   observations: string;
   commercialInput: CommercialInputData;
+  salesResults: SalesResultsData;
   aiAnalysis: AIAnalysisData;
 }
 

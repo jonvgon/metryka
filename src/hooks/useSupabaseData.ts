@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Clinic, FunnelData, CostData, AnalysisData, CommercialInputData, AIAnalysisData } from '@/types/clinic';
+import { Clinic, FunnelData, CostData, AnalysisData, CommercialInputData, AIAnalysisData, SalesResultsData } from '@/types/clinic';
 import { Gestor } from '@/types/gestor';
 import { toast } from 'sonner';
 
@@ -18,6 +18,13 @@ const emptyAIAnalysis: AIAnalysisData = {
   diagnosticoComercial: '',
   explicacaoTecnica: '',
   recomendacoesIA: '',
+};
+
+const emptySalesResults: SalesResultsData = {
+  valorFechamento: 0,
+  orcamentoAberto: 0,
+  leadsPerdidos: 0,
+  motivoPerdido: '',
 };
 
 export function useSupabaseData() {
@@ -98,6 +105,12 @@ export function useSupabaseData() {
         linkAtendimentosRuins: a.link_atendimentos_ruins || '',
         linkAtendimentosBons: a.link_atendimentos_bons || '',
         proximosPassos: a.proximos_passos || '',
+      },
+      salesResults: {
+        valorFechamento: Number(a.valor_fechamento) || 0,
+        orcamentoAberto: Number(a.orcamento_aberto) || 0,
+        leadsPerdidos: a.leads_perdidos || 0,
+        motivoPerdido: a.motivo_perdido || '',
       },
       aiAnalysis: {
         diagnosticoComercial: a.diagnostico_comercial || '',
@@ -208,6 +221,7 @@ export function useSupabaseData() {
     images: string[],
     observations: string,
     commercialInput: CommercialInputData = emptyCommercialInput,
+    salesResults: SalesResultsData = emptySalesResults,
     aiAnalysis: AIAnalysisData = emptyAIAnalysis
   ) => {
     setSaving(true);
@@ -234,6 +248,10 @@ export function useSupabaseData() {
       link_atendimentos_ruins: commercialInput.linkAtendimentosRuins,
       link_atendimentos_bons: commercialInput.linkAtendimentosBons,
       proximos_passos: commercialInput.proximosPassos,
+      valor_fechamento: salesResults.valorFechamento,
+      orcamento_aberto: salesResults.orcamentoAberto,
+      leads_perdidos: salesResults.leadsPerdidos,
+      motivo_perdido: salesResults.motivoPerdido,
       diagnostico_comercial: aiAnalysis.diagnosticoComercial,
       explicacao_tecnica: aiAnalysis.explicacaoTecnica,
       recomendacoes_ia: aiAnalysis.recomendacoesIA,
@@ -280,6 +298,7 @@ export function useSupabaseData() {
       images,
       observations,
       commercialInput,
+      salesResults,
       aiAnalysis,
     };
 
