@@ -76,7 +76,8 @@ export function CommercialInputSection({ data, onChange }: CommercialInputSectio
               className="resize-none"
             />
             {data.linkAtendimentosRuins && data.linkAtendimentosRuins.trim() && (
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-2 p-3 bg-muted/50 rounded-lg border border-border/50">
+                <span className="text-xs text-muted-foreground font-medium">Links inseridos:</span>
                 {data.linkAtendimentosRuins
                   .split('\n')
                   .map(link => link.trim())
@@ -87,7 +88,7 @@ export function CommercialInputSection({ data, onChange }: CommercialInputSectio
                       href={link.startsWith('http') ? link : `https://${link}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-primary hover:underline break-all"
+                      className="text-sm text-primary hover:text-primary/80 hover:underline break-all transition-colors"
                     >
                       {link}
                     </a>
@@ -106,7 +107,8 @@ export function CommercialInputSection({ data, onChange }: CommercialInputSectio
               className="resize-none"
             />
             {data.linkAtendimentosBons && data.linkAtendimentosBons.trim() && (
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-2 p-3 bg-muted/50 rounded-lg border border-border/50">
+                <span className="text-xs text-muted-foreground font-medium">Links inseridos:</span>
                 {data.linkAtendimentosBons
                   .split('\n')
                   .map(link => link.trim())
@@ -117,7 +119,7 @@ export function CommercialInputSection({ data, onChange }: CommercialInputSectio
                       href={link.startsWith('http') ? link : `https://${link}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-primary hover:underline break-all"
+                      className="text-sm text-primary hover:text-primary/80 hover:underline break-all transition-colors"
                     >
                       {link}
                     </a>
