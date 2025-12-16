@@ -5,7 +5,7 @@ import {
   FunnelData,
   AnalysisData,
   CommercialInputData,
-  AIAnalysisData,
+  SalesResultsData,
 } from "@/types/clinic";
 import { Gestor } from "@/types/gestor";
 import { toast } from "sonner";
@@ -20,10 +20,11 @@ const emptyCommercialInput: CommercialInputData = {
   proximosPassos: "",
 };
 
-const emptyAIAnalysis: AIAnalysisData = {
-  diagnosticoComercial: "",
-  explicacaoTecnica: "",
-  recomendacoesIA: "",
+const emptySalesResults: SalesResultsData = {
+  valorFechamento: 0,
+  orcamentoAberto: 0,
+  leadsPerdidos: 0,
+  motivoPerdido: "",
 };
 
 export function useSupabaseData() {
@@ -95,12 +96,6 @@ export function useSupabaseData() {
           comparecimentos: a.comparecimentos,
           vendas: a.vendas,
         },
-        costs: {
-          custoLeadMeta: Number(a.custo_lead_meta),
-          custoLeadGoogle: Number(a.custo_lead_google),
-          valorGastoMeta: Number(a.valor_gasto_meta),
-          valorGastoGoogle: Number(a.valor_gasto_google),
-        },
         images: a.images || [],
         observations: a.observations || "",
         commercialInput: {
@@ -112,10 +107,11 @@ export function useSupabaseData() {
           linkAtendimentosBons: a.link_atendimentos_bons || "",
           proximosPassos: a.proximos_passos || "",
         },
-        aiAnalysis: {
-          diagnosticoComercial: a.diagnostico_comercial || "",
-          explicacaoTecnica: a.explicacao_tecnica || "",
-          recomendacoesIA: a.recomendacoes_ia || "",
+        salesResults: {
+          valorFechamento: Number(a.valor_fechamento) || 0,
+          orcamentoAberto: Number(a.orcamento_aberto) || 0,
+          leadsPerdidos: a.leads_perdidos || 0,
+          motivoPerdido: a.motivo_perdido || "",
         },
       }))
     );
@@ -216,10 +212,11 @@ export function useSupabaseData() {
     startDate: string,
     endDate: string,
     funnel: FunnelData,
+    costs: CostData,
     images: string[],
     observations: string,
     commercialInput: CommercialInputData = emptyCommercialInput,
-    aiAnalysis: AIAnalysisData = emptyAIAnalysis
+    salesResults: SalesResultsData = emptySalesResults
   ) => {
     setSaving(true);
 
@@ -241,9 +238,10 @@ export function useSupabaseData() {
       link_atendimentos_ruins: commercialInput.linkAtendimentosRuins,
       link_atendimentos_bons: commercialInput.linkAtendimentosBons,
       proximos_passos: commercialInput.proximosPassos,
-      diagnostico_comercial: aiAnalysis.diagnosticoComercial,
-      explicacao_tecnica: aiAnalysis.explicacaoTecnica,
-      recomendacoes_ia: aiAnalysis.recomendacoesIA,
+      valor_fechamento: salesResults.valorFechamento,
+      orcamento_aberto: salesResults.orcamentoAberto,
+      leads_perdidos: salesResults.leadsPerdidos,
+      motivo_perdido: salesResults.motivoPerdido,
     };
 
     // Check if analysis exists
@@ -284,7 +282,7 @@ export function useSupabaseData() {
       images,
       observations,
       commercialInput,
-      aiAnalysis,
+      salesResults,
     };
 
     setAnalyses((prev) => {

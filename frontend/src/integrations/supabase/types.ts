@@ -33,13 +33,17 @@ export type Database = {
           leads_crm: number
           leads_interessados: boolean | null
           leads_marketing: number
+          leads_perdidos: number
           link_atendimentos_bons: string | null
           link_atendimentos_ruins: string | null
+          motivo_perdido: string | null
           observations: string | null
+          orcamento_aberto: number
           proximos_passos: string | null
           recomendacoes_ia: string | null
           start_date: string
           updated_at: string
+          valor_fechamento: number
           valor_gasto_google: number
           valor_gasto_meta: number
           vendas: number
@@ -62,13 +66,17 @@ export type Database = {
           leads_crm?: number
           leads_interessados?: boolean | null
           leads_marketing?: number
+          leads_perdidos?: number
           link_atendimentos_bons?: string | null
           link_atendimentos_ruins?: string | null
+          motivo_perdido?: string | null
           observations?: string | null
+          orcamento_aberto?: number
           proximos_passos?: string | null
           recomendacoes_ia?: string | null
           start_date: string
           updated_at?: string
+          valor_fechamento?: number
           valor_gasto_google?: number
           valor_gasto_meta?: number
           vendas?: number
@@ -91,13 +99,17 @@ export type Database = {
           leads_crm?: number
           leads_interessados?: boolean | null
           leads_marketing?: number
+          leads_perdidos?: number
           link_atendimentos_bons?: string | null
           link_atendimentos_ruins?: string | null
+          motivo_perdido?: string | null
           observations?: string | null
+          orcamento_aberto?: number
           proximos_passos?: string | null
           recomendacoes_ia?: string | null
           start_date?: string
           updated_at?: string
+          valor_fechamento?: number
           valor_gasto_google?: number
           valor_gasto_meta?: number
           vendas?: number

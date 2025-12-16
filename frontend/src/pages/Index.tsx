@@ -21,6 +21,7 @@ import { useSupabaseData } from "@/hooks/useSupabaseData";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Save, Loader2, Activity } from "lucide-react";
+import { SalesResultsInput } from "@/components/SalesResultsInput";
 
 const getDefaultDates = () => {
   const today = new Date();
@@ -86,6 +87,13 @@ const Index = () => {
     vendas: 0,
   };
 
+  const emptySalesResults: SalesResultsData = {
+    valorFechamento: 0,
+    orcamentoAberto: 0,
+    leadsPerdidos: 0,
+    motivoPerdido: "",
+  };
+
   const emptyCommercialInput: CommercialInputData = {
     cplBom: null,
     leadsInteressados: null,
@@ -99,6 +107,8 @@ const Index = () => {
   // Local state for form data
   const [funnel, setFunnel] = useState<FunnelData>({});
   const [leadsMarketing, setLeadsMarketing] = useState<number>(0);
+  const [salesResults, setSalesResults] =
+    useState<SalesResultsData>(emptySalesResults);
   const [costs, setCosts] = useState<{
     valorGastoGoogle: number;
     valorGastoMeta: number;
@@ -406,6 +416,11 @@ const Index = () => {
               <FunnelDataInput data={funnel} onChange={setFunnel} />
 
               <FunnelVisualization data={funnel} />
+
+              <SalesResultsInput
+                data={salesResults}
+                onChange={setSalesResults}
+              />
 
               <CommercialAnalysis
                 images={images}
