@@ -22,6 +22,7 @@ interface ClinicSelectorProps {
   ) => void;
   onSelectClinic: (clinic: Clinic | null) => void;
   onDeleteClinic: (id: string, name: string) => void;
+  clinicError: string;
 }
 
 export function ClinicSelector({
@@ -30,6 +31,7 @@ export function ClinicSelector({
   onAddClinic,
   onSelectClinic,
   onDeleteClinic,
+  clinicError,
 }: ClinicSelectorProps) {
   const [metaState, setMetaState] = useState(false);
   const [googleState, setGoogleState] = useState(false);
@@ -74,66 +76,84 @@ export function ClinicSelector({
         <CardTitle className="text-lg font-semibold">Clínica</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <form className="flex gap-2 flex-col" onSubmit={handleAddClinic}>
-          <Input
-            placeholder="Nome da nova clínica"
-            required={true}
-            value={clinicName}
-            onChange={(e) => setClinicName(e.target.value)}
-            name="clinicName"
-          />
-          <div className="flex flex-row gap-5 mb-3">
-            <div className="flex flex-row gap-3 w-max">
-              <Input
-                placeholder="Id do Meta Ads"
-                onChange={(e) => onChangeTagInput(e)}
-                disabled={metaState}
-                required={!metaState}
-                value={MetaTagInputVal}
-                name="metaAdsId"
-              />
-              <div className="flex flex-row-reverse w-50 items-center gap-2">
-                <label htmlFor="noMeta" className="text-xs text-nowrap">
-                  Sem Meta Ads
-                </label>
+        <form className="flex gap-5 flex-col w-full" onSubmit={handleAddClinic}>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="clinicName" className="text-xs md:text-sm">
+              Nome da nova clínica
+            </label>
+            <Input
+              placeholder="Nome da nova clínica"
+              required={true}
+              value={clinicName}
+              onChange={(e) => setClinicName(e.target.value)}
+              name="clinicName"
+            />
+          </div>
+          <div className="flex flex-col md:flex-row gap-2 md:gap-10 mb-3">
+            <div className="flex flex-col gap-2 w-full">
+              <label htmlFor="metaAdsId" className="text-xs md:text-sm">
+                ID da conta de anúncio (Meta Ads)
+              </label>
+              <div className="flex flex-col md:flex-row gap-0 md:gap-3 items-start">
                 <Input
-                  type="checkbox"
-                  id="noMeta"
-                  className="w-6"
-                  checked={metaState}
-                  onChange={(e) => {
-                    setMetaState(e.target.checked);
-                    setGoogleState(false);
-                  }}
+                  placeholder="Id do Meta Ads"
+                  onChange={(e) => onChangeTagInput(e)}
+                  disabled={metaState}
+                  required={!metaState}
+                  value={MetaTagInputVal}
+                  name="metaAdsId"
                 />
+                <div className="flex flex-row-reverse w-50 items-center gap-2">
+                  <label htmlFor="noMeta" className="text-xs text-nowrap">
+                    Sem Meta Ads
+                  </label>
+                  <Input
+                    type="checkbox"
+                    id="noMeta"
+                    className="w-6"
+                    checked={metaState}
+                    onChange={(e) => {
+                      setMetaState(e.target.checked);
+                      setGoogleState(false);
+                    }}
+                  />
+                </div>
               </div>
             </div>
-            <div className="flex flex-row w-max items-center gap-3">
-              <Input
-                placeholder="Id do Google Ads"
-                onChange={(e) => onChangeTagInput(e)}
-                value={googleTagInputVal}
-                disabled={googleState}
-                required={!googleState}
-                name="googleAdsId"
-              />
-              <div className="flex flex-row-reverse items-center gap-2">
-                <label htmlFor="noGoogle" className="text-xs text-nowrap">
-                  Sem Google Ads
-                </label>
+            <div className="flex flex-col w-full gap-2">
+              <label htmlFor="googleAdsId" className="text-xs md:text-sm">
+                ID da conta de anúncio (Google Ads)
+              </label>
+              <div className="flex flex-col md:flex-row gap-0 md:gap-3 items-start">
                 <Input
-                  type="checkbox"
-                  id="noGoogle"
-                  className="w-6"
-                  checked={googleState}
-                  onChange={(e) => {
-                    setGoogleState(e.target.checked);
-                    setMetaState(false);
-                  }}
+                  placeholder="Id do Google Ads"
+                  onChange={(e) => onChangeTagInput(e)}
+                  value={googleTagInputVal}
+                  disabled={googleState}
+                  required={!googleState}
+                  name="googleAdsId"
                 />
+                <div className="flex flex-row-reverse items-center gap-2">
+                  <label htmlFor="noGoogle" className="text-xs text-nowrap">
+                    Sem Google Ads
+                  </label>
+                  <Input
+                    type="checkbox"
+                    id="noGoogle"
+                    className="w-6"
+                    checked={googleState}
+                    onChange={(e) => {
+                      setGoogleState(e.target.checked);
+                      setMetaState(false);
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </div>
+          {clinicError == "Existing Clinic" && (
+            <h2 className="text-red-400">Clínica Já existente!</h2>
+          )}
           <Button type="submit">Adicionar clínica</Button>
         </form>
 

@@ -75,6 +75,7 @@ const Index = () => {
   const [startDate, setStartDate] = useState<string>(defaultDates.start);
   const [endDate, setEndDate] = useState<string>(defaultDates.end);
   const [dataVisibility, setDataVisibility] = useState<string | null>("false");
+  const [errorVisibility, setErrorVisibility] = useState<string | null>("");
   const [selectedClinicName, setSelectedClinicName] = useState<string | null>(
     null
   );
@@ -302,7 +303,7 @@ const Index = () => {
   ) => {
     if (!selectedGestorId) return;
 
-    fetch("/api/clinics", {
+    const response = await fetch("/api/clinics", {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -315,11 +316,17 @@ const Index = () => {
       }),
     });
 
-    const newClinic = await addClinic(name, selectedGestorId);
-
-    if (newClinic) {
-      setSelectedClinicId(newClinic.id);
-      setSelectedClinicName(name);
+    if (response.status == 204) {
+      const newClinic = await addClinic(name, selectedGestorId);
+      if (newClinic) {
+        setSelectedClinicId(newClinic.id);
+        setSelectedClinicName(name);
+      }
+    } else if (response.status == 409) {
+      setErrorVisibility("Existing Clinic");
+      setTimeout(() => {
+        setErrorVisibility("");
+      }, 3000);
     }
   };
 
@@ -404,6 +411,7 @@ const Index = () => {
               onAddClinic={handleAddClinic}
               onSelectClinic={handleSelectClinic}
               onDeleteClinic={handleDeleteClinic}
+              clinicError={errorVisibility}
             />
           )}
 

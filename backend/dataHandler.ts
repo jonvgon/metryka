@@ -90,24 +90,32 @@ export const modifyJSONFileClinicList = async (clinicData: {
 
   const json = JSON.parse(fileContent);
 
-  json.clinics.push({
-    name: clinicData.name,
-    Google_Ads_id: clinicData.googleAdsId,
-    Meta_Ads_id: clinicData.metaAdsId,
+  const existingClinic = json.clinics.findIndex((obj) => {
+    return obj.name.toUpperCase() == clinicData.name.toUpperCase();
   });
 
-  fs.writeFile(
-    filePath,
-    JSON.stringify(json, null, 2),
-    "utf8",
-    (err: string) => {
-      if (err) {
-        console.error("Erro ao escrever o arquivo: ", err);
-      } else {
-        console.log("Clínica adicionada com sucesso!");
+  if (existingClinic !== -1) {
+    return 409;
+  } else {
+    json.clinics.push({
+      name: clinicData.name,
+      Google_Ads_id: clinicData.googleAdsId,
+      Meta_Ads_id: clinicData.metaAdsId,
+    });
+
+    fs.writeFile(
+      filePath,
+      JSON.stringify(json, null, 2),
+      "utf8",
+      (err: string) => {
+        if (err) {
+          console.error("Erro ao escrever o arquivo: ", err);
+        } else {
+          console.log("Clínica adicionada com sucesso!");
+        }
       }
-    }
-  );
+    );
+  }
 };
 
 export const deleteJSONFileClinicList = async (clinicName: string) => {

@@ -122,9 +122,13 @@ app.get("/api/clinics", async (req, res) => {
   res.send(clinicIds);
 });
 
-app.post("/api/clinics", (req, res) => {
-  modifyJSONFileClinicList(req.body);
-  res.status(200).send("Ok!");
+app.post("/api/clinics", async (req, res) => {
+  const response = await modifyJSONFileClinicList(req.body);
+  if (response == 409) {
+    res.status(409).send({ message: "Clínica já existe!" });
+  } else {
+    res.status(204).send({ message: "Clínica adicionada com sucesso!" });
+  }
 });
 
 app.delete("/api/clinics", (req, res) => {
