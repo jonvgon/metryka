@@ -2,7 +2,6 @@ import {
   getMetaInsightsPerCampaign,
   getAdAccountSpend,
   getGoogleInsights,
-  getUserInfo,
 } from "./dataFetcher.ts";
 import fs from "node:fs";
 import { promisify } from "util";
@@ -149,42 +148,6 @@ export const deleteJSONFileClinicList = async (clinicName: string) => {
       }
     }
   );
-};
-
-export const writeToRefreshTokensList = async (token, refreshToken) => {
-  const userData = await getUserInfo(token);
-  const filePath = path.join(__dirname, "refreshTokens.json");
-  let clinics: Array<{
-    name: string;
-    Google_Ads_id: string | null;
-    Meta_Ads_id: string | null;
-  }>;
-
-  const fileContent = await readFileAsync(filePath, "utf8");
-
-  const json = JSON.parse(fileContent);
-
-  if (!json?.[userData.sub]) {
-    json[userData.sub] = {
-      user_refresh_token: refreshToken,
-      user_email: userData.email,
-      name: userData.given_name,
-      surname: userData.family_name,
-    };
-
-    fs.writeFile(
-      filePath,
-      JSON.stringify(json, null, 2),
-      "utf8",
-      (err: string) => {
-        if (err) {
-          console.error("Erro ao adicionar o usuário: ", err);
-        } else {
-          console.log("usuário adicionado com sucesso.");
-        }
-      }
-    );
-  }
 };
 
 export const returnMetaSpendData = async (
