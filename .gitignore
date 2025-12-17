@@ -13,6 +13,8 @@ frontend/dist-ssr
 *.local
 backend/.env
 backend/node_modules
+backend/refreshTokens.json
+backend/clinicList.json
 
 # Editor directories and files
 .vscode/*
