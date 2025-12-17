@@ -13,9 +13,8 @@ import {
   returnMetaSpendData,
   sumAllMetaConversions,
   deleteJSONFileClinicList,
+  writeToRefreshTokensList,
 } from "./dataHandler.ts";
-
-import { getGoogleInsights } from "./dataFetcher.ts";
 
 dns.setDefaultResultOrder("ipv4first");
 
@@ -26,13 +25,11 @@ dotenv.config({ path: path.resolve(__dirname, ".env") });
 
 const app = express();
 
-const oAuth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_OAUTH_CLIENT_ID,
-  process.env.GOOGLE_OAUTH_CLIENT_SECRET,
-  process.env.GOOGLE_OAUTH_REDIRECT_URI
-);
-
-const scopes = ["https://www.googleapis.com/auth/adwords"];
+const scopes = [
+  "https://www.googleapis.com/auth/adwords",
+  "https://www.googleapis.com/auth/userinfo.email",
+  "https://www.googleapis.com/auth/userinfo.profile",
+];
 
 app.set("trust proxy", 1);
 app.use(express.json());
@@ -43,6 +40,12 @@ app.use(
     saveUninitialized: true,
     cookie: { secure: true, sameSite: "lax", maxAge: 155520000 },
   })
+);
+
+const oAuth2Client = new google.auth.OAuth2(
+  process.env.GOOGLE_OAUTH_CLIENT_ID,
+  process.env.GOOGLE_OAUTH_CLIENT_SECRET,
+  process.env.GOOGLE_OAUTH_REDIRECT_URI
 );
 
 app.get("/api/auth", (req, res) => {
@@ -78,11 +81,15 @@ app.get("/api/endAuth", async (req, res) => {
   }
 
   try {
-    const { tokens } = await oAuth2Client.getToken(code as string);
-
-    req.session.googleTokens = tokens;
+    const { tokens } = await oAuth2Client.getToken(query.code);
 
     oAuth2Client.setCredentials(tokens);
+
+    const { token } = await oAuth2Client.getAccessToken();
+
+    req.session.googleToken = token;
+
+    writeToRefreshTokensList(token, tokens.refresh_token);
 
     res.redirect("https://metryka-dev.insitemarketing.digital");
   } catch (err: any) {
@@ -110,7 +117,7 @@ app.get("/api/endAuth", async (req, res) => {
 app.get("/api/google/totalData", async (req, res) => {
   const googleRequestedData = returnGoogleData(
     req.query.accountId as string,
-    req.session?.googleTokens?.access_token as string,
+    req.session.googleToken as string,
     req.query.startDate as string,
     req.query.endDate as string
   );
@@ -154,7 +161,7 @@ app.get("/api/meta/conversions", async (req, res) => {
 });
 
 app.get("/api/auth/status", (req, res) => {
-  if (req.session.googleTokens) {
+  if (req.session.googleToken) {
     res.send({ loggedIn: true });
   } else {
     res.send({ loggedIn: false });
