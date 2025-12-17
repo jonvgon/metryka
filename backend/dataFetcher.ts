@@ -103,3 +103,21 @@ export const getGoogleInsights = async (
     // throw err;
   }
 };
+
+export const getUserInfo = async (access_token: string) => {
+  try {
+    const response = await axios.get(
+      "https://www.googleapis.com/oauth2/v3/userinfo",
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (err: any) {
+    console.log(
+      "Erro do dataFetcher! " + JSON.stringify(err.response?.data, null, 2)
+    );
+  }
+};
