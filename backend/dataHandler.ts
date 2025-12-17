@@ -154,11 +154,6 @@ export const deleteJSONFileClinicList = async (clinicName: string) => {
 export const writeToRefreshTokensList = async (token, refreshToken) => {
   const userData = await getUserInfo(token);
   const filePath = path.join(__dirname, "refreshTokens.json");
-  let clinics: Array<{
-    name: string;
-    Google_Ads_id: string | null;
-    Meta_Ads_id: string | null;
-  }>;
 
   const fileContent = await readFileAsync(filePath, "utf8");
 
